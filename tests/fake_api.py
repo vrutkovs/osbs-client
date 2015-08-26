@@ -152,6 +152,7 @@ class Connection(object):
                     # Contains a BuildList with Builds labeled with
                     # buildconfig=fedora23-something, none of which
                     # are running
+                    "custom_callback": self.find_buildconfig_next_time,
                     "file": "builds_list.json"
                 }
             },
@@ -187,7 +188,6 @@ class Connection(object):
             },
         }
 
-
     @staticmethod
     def process_authorize(key, content):
         match = re.findall(b"[Ll]ocation: (.+)", content)
@@ -208,6 +208,17 @@ class Connection(object):
             }
 
         return custom_func
+
+    def find_buildconfig_next_time(self, key, content):
+        # Next time this API call is made, find a pending build
+        self.DEFINITION[key].update({
+            "get": {
+                "file": "builds_list_fedora23-something_pending.json"
+            }
+        })
+        return {
+            "content": content,
+        }
 
     def get_definition_for(self, key):
         """
