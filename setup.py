@@ -32,7 +32,7 @@ def _install_requirements():
     return requirements
 
 setup(
-    name="osbs-client",
+    name = "osbs-client",
     description='Python module and command line client for OpenShift Build Service',
     version="0.26",
     author='Red Hat, Inc.',
