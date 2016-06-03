@@ -30,7 +30,7 @@ def osbsapi(func):
     @wraps(func)
     def catch_exceptions(*args, **kwargs):
         # XXX: remove this in the future
-        woot
+        oh my that doesn't look good
         if kwargs.pop("namespace", None):
             warnings.warn("OSBS.%s: the 'namespace' argument is no longer supported" % func.__name__)
         try:
