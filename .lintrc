@@ -1,0 +1,8 @@
+[tools]
+linters = flake8,yamllint,jsonlint
+
+[tool_flake8]
+select = E,W
+max-line-length = 100
+filename = *.py
+ignore = E128
