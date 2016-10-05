@@ -108,6 +108,11 @@ def cmd_list_builds(args, osbs):
                                    for status in BUILD_FINISHED_STATES])
         kwargs['field_selector'] = field_selector
 
+    if args.FILTER and '=' in args.FILTER:
+        (filter_field, filter_value) = args.FILTER.split('=')
+        kwargs['field_selector'] = '{field}={value}'.format(
+            field=filter_field, value=filter_value.capitalize())
+
     if args.from_json:
         with open(args.from_json) as fp:
             builds = [BuildResponse(build) for build in json.load(fp)]
@@ -143,7 +148,7 @@ def cmd_list_builds(args, osbs):
                 image = strip_registry_from_image(build.get_repositories()["primary"][0])
             except (TypeError, KeyError, IndexError):
                 image = ""  # "" or unique_image? failed builds don't have that ^
-            if args.FILTER and args.FILTER not in image:
+            if args.FILTER and '=' not in args.FILTER and args.FILTER not in image:
                 continue
             if args.running and not build.is_in_progress():
                 continue
