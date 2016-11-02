@@ -77,11 +77,6 @@
       "name": "distribution_scope"
     }
   ],
-  "prepublish_plugins": [
-    {
-      "name": "squash"
-    }
-  ],
   "postbuild_plugins": [
     {
       "args": {
@@ -104,6 +99,13 @@
       }
     },
     {
+      "name": "compress",
+      "args": {
+        "load_exported_image": false,
+        "method": "gzip"
+      }
+    },
+    {
       "name": "pulp_push",
       "args": {
         "pulp_registry_name": "{{PULP_REGISTRY_NAME}}",
@@ -117,13 +119,6 @@
         "pulp_registry_name": "{{PULP_REGISTRY_NAME}}",
         "docker_registry": "{{DOCKER_REGISTRY}}",
         "dockpulp_loglevel": "INFO"
-      }
-    },
-    {
-      "name": "compress",
-      "args": {
-        "load_exported_image": true,
-        "method": "gzip"
       }
     },
     {
@@ -178,5 +173,8 @@
       },
       "name": "sendmail"
     }
-  ]
+  ],
+  "buildstep_plugin": {
+    "name": "oc_dockerbuild"
+  }
 }
