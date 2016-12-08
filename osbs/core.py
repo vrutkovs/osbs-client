@@ -23,7 +23,11 @@ from osbs.exceptions import (OsbsResponseException, OsbsException,
                              OsbsWatchBuildNotFound, OsbsAuthException,
                              OsbsNetworkException)
 from osbs.utils import graceful_chain_get
-from httplib import IncompleteRead
+try:
+    from httplib import IncompleteRead
+except ImportError:
+    # Python3
+    from http.client import IncompleteRead
 
 try:
     # py2
