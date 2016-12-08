@@ -14,7 +14,6 @@ from __future__ import print_function, absolute_import, unicode_literals
 import sys
 import json
 import logging
-from io import BytesIO
 
 from osbs.exceptions import OsbsException, OsbsNetworkException, OsbsResponseException
 

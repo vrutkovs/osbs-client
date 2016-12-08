@@ -20,8 +20,7 @@ from osbs.constants import WATCH_MODIFIED, WATCH_DELETED, WATCH_ERROR
 from osbs.constants import (SERVICEACCOUNT_SECRET, SERVICEACCOUNT_TOKEN,
                             SERVICEACCOUNT_CACRT)
 from osbs.exceptions import (OsbsResponseException, OsbsException,
-                             OsbsWatchBuildNotFound, OsbsAuthException,
-                             OsbsNetworkException)
+                             OsbsWatchBuildNotFound, OsbsAuthException)
 from osbs.utils import graceful_chain_get
 try:
     from httplib import IncompleteRead
