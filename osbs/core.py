@@ -553,6 +553,8 @@ class Openshift(object):
             with self._get(url, stream=True, headers={'Connection': 'close'}) as response:
                 check_response(response)
                 for line in response.iter_lines():
+                    if isinstance(line, bytes):
+                        line = line.decode('utf-8')
                     logger.debug(line)
                     try:
                         j = json.loads(line)
