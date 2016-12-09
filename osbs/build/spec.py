@@ -252,9 +252,9 @@ class BuildSpec(object):
         self.git_push_username.value = git_push_username
         self.git_branch.value = git_branch
         self.name.value = make_name_from_git(self.git_uri.value, self.git_branch.value)
-        if not base_image:
-            raise OsbsValidationException("base_image must be provided")
-        self.trigger_imagestreamtag.value = get_imagestreamtag_from_image(base_image)
+#        if not base_image:
+#            raise OsbsValidationException("base_image must be provided")
+#        self.trigger_imagestreamtag.value = get_imagestreamtag_from_image(base_image)
         self.builder_build_json_dir.value = builder_build_json_dir
         if not name_label:
             raise OsbsValidationException("name_label must be provided")
