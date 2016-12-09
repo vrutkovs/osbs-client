@@ -359,17 +359,10 @@ class OSBS(object):
         :param scratch: bool, this is a scratch build
         :return: BuildResponse instance
         """
-        df_parser = utils.get_df_parser(git_uri, git_ref, git_branch=git_branch)
+        # FIXME: set correct name by reading flatpak.json
+        name_label = git_branch
+
         build_request = self.get_build_request()
-        labels = df_parser.labels
-        for name_label_name in ['name', 'Name']:
-            if name_label_name in labels:
-                name_label = labels[name_label_name]
-                break
-        else:
-            raise OsbsValidationException("required label '{name}' missing "
-                                          "from Dockerfile"
-                                          .format(name=name_label_name))
 
         build_request.set_params(
             git_uri=git_uri,
@@ -379,7 +372,7 @@ class OSBS(object):
             component=component,
             build_image=self.build_conf.get_build_image(),
             build_imagestream=self.build_conf.get_build_imagestream(),
-            base_image=df_parser.baseimage,
+            base_image=None,
             name_label=name_label,
             registry_uris=self.build_conf.get_registry_uris(),
             registry_secrets=self.build_conf.get_registry_secrets(),
