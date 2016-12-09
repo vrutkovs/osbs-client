@@ -49,12 +49,6 @@
       "name": "koji"
     },
     {
-      "args": {
-        "repourls": []
-      },
-      "name": "add_yum_repo_by_url"
-    },
-    {
       "name": "dockerfile_content"
     },
     {
