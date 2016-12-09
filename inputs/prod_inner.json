@@ -23,9 +23,6 @@
       }
     },
     {
-      "name": "change_from_in_dockerfile"
-    },
-    {
       "name": "add_dockerfile"
     },
     {
