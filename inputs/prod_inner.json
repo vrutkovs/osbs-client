@@ -23,13 +23,6 @@
       }
     },
     {
-      "name": "pull_base_image",
-      "args": {
-        "parent_registry": "{{REGISTRY_URI}}",
-        "parent_registry_insecure": true
-      }
-    },
-    {
       "args": {
         "hub": "{{KOJI_HUB}}"
       },
