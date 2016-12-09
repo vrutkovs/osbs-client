@@ -16,31 +16,10 @@
       "name": "stop_autorebuild_if_disabled"
     },
     {
-      "name": "add_filesystem",
-      "args": {
-        "koji_hub": "{{KOJI_HUB}}",
-        "repos": []
-      }
-    },
-    {
       "args": {
         "command": "{{SOURCES_COMMAND}}"
       },
       "name": "distgit_fetch_artefacts"
-    },
-    {
-      "args": {
-        "root": "{{KOJI_ROOT}}",
-        "target": "{{KOJI_TARGET}}",
-        "hub": "{{KOJI_HUB}}"
-      },
-      "name": "koji"
-    },
-    {
-      "name": "dockerfile_content"
-    },
-    {
-      "name": "distribution_scope"
     }
   ],
   "postbuild_plugins": [
