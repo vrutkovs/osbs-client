@@ -175,6 +175,6 @@
     }
   ],
   "buildstep_plugin": {
-    "name": "oc_dockerbuild"
+    "name": "flatpak"
   }
 }
