@@ -23,9 +23,6 @@
       }
     },
     {
-      "name": "add_dockerfile"
-    },
-    {
       "args": {
         "command": "{{SOURCES_COMMAND}}"
       },
