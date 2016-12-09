@@ -24,12 +24,6 @@
     },
     {
       "args": {
-        "hub": "{{KOJI_HUB}}"
-      },
-      "name": "bump_release"
-    },
-    {
-      "args": {
         "labels": "{{IMPLICIT_LABELS}}"
       },
       "name": "add_labels_in_dockerfile"
