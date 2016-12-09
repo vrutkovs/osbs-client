@@ -125,12 +125,6 @@
   ],
   "exit_plugins": [
     {
-      "name": "delete_from_registry",
-      "args": {
-        "registries": {}
-      }
-    },
-    {
       "name": "koji_promote",
       "args": {
         "kojihub": "{{KOJI_HUB}}",
