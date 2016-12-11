@@ -679,7 +679,7 @@ class BuildRequest(object):
 
         use_auth = self.spec.use_auth.value
         self.render_check_and_set_rebuild(use_auth=use_auth)
-        self.render_store_metadata_in_osv3(use_auth=use_auth)
+        #self.render_store_metadata_in_osv3(use_auth=use_auth)
 
         # Remove legacy sourceSecret in case an older template is used.
         if 'sourceSecret' in self.template['spec']['source']:
