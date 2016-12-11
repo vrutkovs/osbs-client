@@ -713,8 +713,8 @@ class BuildRequest(object):
 
         # pull_base_image wants a docker URI so strip off the scheme part
         source_registry = self.spec.source_registry_uri.value
-        self.dj.dock_json_set_arg('prebuild_plugins', "pull_base_image", "parent_registry",
-                                  source_registry.docker_uri if source_registry else None)
+        #self.dj.dock_json_set_arg('prebuild_plugins', "pull_base_image", "parent_registry",
+        #                          source_registry.docker_uri if source_registry else None)
 
         # The rebuild trigger requires git_branch and git_push_url
         # parameters, but those parameters are optional. If either was
@@ -782,15 +782,15 @@ class BuildRequest(object):
             self.template['metadata']['labels']['koji-task-id'] = str(koji_task_id)
 
         use_auth = self.spec.use_auth.value
-        self.render_add_filesystem()
-        self.render_add_labels_in_dockerfile()
-        self.render_koji()
-        self.render_bump_release()
-        self.render_import_image(use_auth=use_auth)
-        self.render_pulp_push()
-        self.render_pulp_sync()
-        self.render_koji_promote(use_auth=use_auth)
-        self.render_sendmail()
+        #self.render_add_filesystem()
+        #self.render_add_labels_in_dockerfile()
+        #self.render_koji()
+        #self.render_bump_release()
+        #self.render_import_image(use_auth=use_auth)
+        #self.render_pulp_push()
+        #self.render_pulp_sync()
+        #self.render_koji_promote(use_auth=use_auth)
+        #self.render_sendmail()
 
         self.dj.write_dock_json()
         self.build_json = self.template

@@ -2,117 +2,13 @@
   "prebuild_plugins": [
     {
       "args": {
-        "label_key": "is_autorebuild",
-        "label_value": "true",
-        "url": "{{OPENSHIFT_URI}}",
-        "verify_ssl": false
-      },
-      "name": "check_and_set_rebuild"
-    },
-    {
-      "args": {
-        "config_file": ".osbs-repo-config"
-      },
-      "name": "stop_autorebuild_if_disabled"
-    },
-    {
-      "args": {
         "command": "{{SOURCES_COMMAND}}"
       },
       "name": "distgit_fetch_artefacts"
     }
   ],
-  "postbuild_plugins": [
-    {
-      "args": {
-        "image_id": "BUILT_IMAGE_ID"
-      },
-      "name": "all_rpm_packages"
-    },
-    {
-      "name": "tag_by_labels"
-    },
-    {
-      "name": "tag_from_config"
-    },
-    {
-      "name": "tag_and_push",
-      "args": {
-        "registries": {
-          "{{REGISTRY_URI}}": { "insecure": true }
-        }
-      }
-    },
-    {
-      "name": "compress",
-      "args": {
-        "load_exported_image": false,
-        "method": "gzip"
-      }
-    },
-    {
-      "name": "pulp_push",
-      "args": {
-        "pulp_registry_name": "{{PULP_REGISTRY_NAME}}",
-        "load_exported_image": true,
-        "dockpulp_loglevel": "INFO"
-      }
-    },
-    {
-      "name": "pulp_sync",
-      "args": {
-        "pulp_registry_name": "{{PULP_REGISTRY_NAME}}",
-        "docker_registry": "{{DOCKER_REGISTRY}}",
-        "dockpulp_loglevel": "INFO"
-      }
-    },
-    {
-      "name": "pulp_pull",
-      "args": {}
-    },
-    {
-      "args": {
-        "imagestream": "{{IMAGESTREAM}}",
-        "docker_image_repo": "{{DOCKER_IMAGE_REPO}}",
-        "url": "{{OPENSHIFT_URI}}",
-        "verify_ssl": false,
-        "build_json_dir": "{{PATH}}"
-      },
-      "name": "import_image"
-    }
-  ],
-  "exit_plugins": [
-    {
-      "name": "koji_promote",
-      "args": {
-        "kojihub": "{{KOJI_HUB}}",
-        "url": "{{OPENSHIFT_URI}}",
-        "verify_ssl": false,
-        "blocksize": 10485760
-      }
-    },
-    {
-      "args": {
-        "url": "{{OPENSHIFT_URI}}",
-        "verify_ssl": false
-      },
-      "name": "store_metadata_in_osv3"
-    },
-    {
-      "name": "remove_built_image"
-    },
-    {
-      "args": {
-        "send_on": ["auto_fail", "auto_success"],
-        "url": "{{OPENSHIFT_URI}}",
-        "pdc_url": "{{PDC_URL}}",
-        "smtp_uri": "{{SMTP_URI}}",
-        "from_address": "osbs@example.com",
-        "error_addresses": ["errors@example.com"]
-      },
-      "name": "sendmail"
-    }
-  ],
+  "postbuild_plugins": [],
+  "exit_plugins": [],
   "buildstep_plugin": {
     "name": "flatpak"
   }
