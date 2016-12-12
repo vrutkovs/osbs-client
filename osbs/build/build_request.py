@@ -789,7 +789,7 @@ class BuildRequest(object):
         #self.render_import_image(use_auth=use_auth)
         #self.render_pulp_push()
         #self.render_pulp_sync()
-        #self.render_koji_promote(use_auth=use_auth)
+        self.render_koji_promote(use_auth=use_auth)
         #self.render_sendmail()
 
         self.dj.write_dock_json()
