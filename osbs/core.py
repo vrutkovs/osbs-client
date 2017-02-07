@@ -17,7 +17,7 @@ import logging
 from osbs.kerberos_ccache import kerberos_ccache_init
 from osbs.build.build_response import BuildResponse
 from osbs.constants import DEFAULT_NAMESPACE, BUILD_FINISHED_STATES, BUILD_RUNNING_STATES, BUILD_CANCELLED_STATE
-from osbs.constants import WATCH_MODIFIED, WATCH_DELETED, WATCH_ERROR
+from osbs.constants import WATCH_MODIFIED, WATCH_DELETED, WATCH_ERROR, WATCH_ADDED
 from osbs.constants import (SERVICEACCOUNT_SECRET, SERVICEACCOUNT_TOKEN,
                             SERVICEACCOUNT_CACRT)
 from osbs.exceptions import (OsbsResponseException, OsbsException,
@@ -369,7 +369,7 @@ class Openshift(object):
     def wait_for_new_build_config_instance(self, build_config_id, prev_version):
         logger.info("waiting for build config %s to get instantiated", build_config_id)
         for changetype, obj in self.watch_resource("buildconfigs", build_config_id):
-            if changetype == WATCH_MODIFIED:
+            if changetype in [WATCH_MODIFIED, WATCH_ADDED]:
                 version = graceful_chain_get(obj, 'status', 'lastVersion')
                 if not isinstance(version, numbers.Integral):
                     logger.error("BuildConfig %s has unexpected lastVersion: %s", build_config_id, version)
