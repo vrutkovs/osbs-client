@@ -112,10 +112,6 @@
         "load_exported_image": true,
         "method": "gzip"
       }
-    },
-    {
-      "name": "pulp_pull",
-      "args": {}
     }
   ],
   "exit_plugins": [
