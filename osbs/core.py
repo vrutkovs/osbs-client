@@ -57,7 +57,7 @@ def check_response(response):
 class Openshift(object):
     def __init__(self, openshift_api_url, openshift_api_version, openshift_oauth_url,
                  k8s_api_url=None,
-                 verbose=False, username=None, password=None, use_kerberos=False,
+                 verbose=True, username=None, password=None, use_kerberos=False,
                  kerberos_keytab=None, kerberos_principal=None, kerberos_ccache=None,
                  client_cert=None, client_key=None, verify_ssl=True, use_auth=None,
                  token=None,

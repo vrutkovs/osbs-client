@@ -98,7 +98,7 @@ def parse_headers(all_headers):
 
 
 class HttpSession(object):
-    def __init__(self, verbose=False):
+    def __init__(self, verbose=True):
         self.verbose = verbose
 
     def get(self, url, **kwargs):
