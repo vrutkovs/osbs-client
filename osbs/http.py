@@ -14,6 +14,7 @@ from __future__ import print_function, absolute_import, unicode_literals
 import sys
 import json
 import logging
+import codecs
 
 from osbs.exceptions import OsbsException, OsbsNetworkException, OsbsResponseException
 
@@ -22,6 +23,8 @@ try:
     from requests_kerberos import HTTPKerberosAuth
 except ImportError:
     HTTPKerberosAuth = None
+
+from distutils.version import StrictVersion
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +39,24 @@ def decoded_json(iterable):
             yield line
         else:
             yield line.decode(requests.utils.guess_json_utf(line))
+
+
+def backported_stream_decode_response_unicode(iterator, r):
+    """Stream decodes a iterator."""
+
+    if r.encoding is None:
+        for item in iterator:
+            yield item
+        return
+
+    decoder = codecs.getincrementaldecoder(r.encoding)(errors='replace')
+    for chunk in iterator:
+        rv = decoder.decode(chunk)
+        if rv:
+            yield rv
+    rv = decoder.decode(b'', final=True)
+    if rv:
+        yield rv
 
 
 class HttpSession(object):
@@ -143,11 +164,99 @@ class HttpStream(object):
     def _get_received_data(self):
         return self.req.text
 
+    def backported_iter_content(self, chunk_size=1, decode_unicode=False):
+        """Iterates over the response data.  When stream=True is set on the
+        request, this avoids reading the content at once into memory for
+        large responses.  The chunk size is the number of bytes it should
+        read into memory.  This is not necessarily the length of each item
+        returned as decoding can take place.
+        chunk_size must be of type int or None. A value of None will
+        function differently depending on the value of `stream`.
+        stream=True will read data as it arrives in whatever size the
+        chunks are received. If stream=False, data is returned as
+        a single chunk.
+        If decode_unicode is True, content will be decoded using the best
+        available encoding based on the response.
+        """
+
+        def generate():
+            # Special case for urllib3.
+            if hasattr(self.req.raw, 'stream'):
+                try:
+                    for chunk in self.req.raw.stream(chunk_size, decode_content=True):
+                        yield chunk
+                except requests.packages.urllib3.exceptions.ProtocolError as e:
+                    raise requests.exceptions.ChunkedEncodingError(e)
+                except requests.packages.urllib3.exceptions.DecodeError as e:
+                    raise requests.exceptions.ContentDecodingError(e)
+                except requests.packages.urllib3.exceptions.ReadTimeoutError as e:
+                    raise requests.exceptions.ConnectionError(e)
+            else:
+                # Standard file-like object.
+                while True:
+                    chunk = self.req.raw.read(chunk_size)
+                    if not chunk:
+                        break
+                    yield chunk
+
+            self.req._content_consumed = True
+
+        if self.req._content_consumed and isinstance(self.req._content, bool):
+            raise requests.exceptions.StreamConsumedError()
+        elif chunk_size is not None and not isinstance(chunk_size, int):
+            raise TypeError("chunk_size must be an int, it is instead a %s." % type(chunk_size))
+        # simulate reading small chunks of the content
+        reused_chunks = requests.utils.iter_slices(self.req._content, chunk_size)
+
+        stream_chunks = generate()
+
+        chunks = reused_chunks if self.req._content_consumed else stream_chunks
+
+        if decode_unicode:
+            chunks = backported_stream_decode_response_unicode(chunks, self.req)
+
+        return chunks
+
+    def backported_iter_lines(self, chunk_size=1, decode_unicode=True, delimiter=None):
+        """Iterates over the response data, one line at a time.  When
+        stream=True is set on the request, this avoids reading the
+        content at once into memory for large responses.
+        .. note:: This method is not reentrant safe.
+        """
+
+        pending = None
+
+        for chunk in self.backported_iter_content(chunk_size=chunk_size, decode_unicode=decode_unicode):
+
+            if pending is not None:
+                chunk = pending + chunk
+
+            if delimiter:
+                lines = chunk.split(delimiter)
+            else:
+                lines = chunk.splitlines()
+
+            if lines and lines[-1] and chunk and lines[-1][-1] == chunk[-1]:
+                pending = lines.pop()
+            else:
+                pending = None
+
+            for line in lines:
+                yield line
+
+        if pending is not None:
+            yield pending
+
     def iter_chunks(self):
         return self.req.iter_content(None)
 
     def iter_lines(self):
-        return self.req.iter_lines(decode_unicode=True)
+
+        if StrictVersion(requests.__version__) < StrictVersion('2.11.1'):
+            # Use a backported version of iter_content
+            return self.backported_iter_lines(decode_unicode=True)
+        else:
+            return self.req.iter_lines(decode_unicode=True)
 
     def close(self):
         if not self.closed:
