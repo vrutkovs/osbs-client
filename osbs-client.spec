@@ -39,7 +39,7 @@
 %global osbs_obsolete_vr 0.14-2
 
 Name:           osbs-client
-Version:        0.38
+Version:        0.39
 %if "x%{postrelease}" != "x0"
 Release:        %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
 %else
@@ -200,6 +200,9 @@ LANG=en_US.utf8 py.test-%{python2_version} -vv tests
 %endif # with_python3
 
 %changelog
+* Thu Apr 27 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.39-0.dev.git.c6b38c5
+- tito (vrutkovs@redhat.com)
+
 * Thu Apr 27 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.38-0.dev.git.c6b38c5
 - Make tito update a version in osbs/__init__.py too (vrutkovs@redhat.com)
 - Add tito configs (vrutkovs@redhat.com)
