@@ -6,5 +6,5 @@ changelog_format = %s (%ae)
 tag_format = {version}
 
 [version_template]
-destination_file = ./osbs/__init__.py
+destination_file = ./osbs/version.py
 template_file = ./rel-eng/version.template
