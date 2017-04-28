@@ -39,7 +39,7 @@
 %global osbs_obsolete_vr 0.14-2
 
 Name:           osbs-client
-Version:        0.37
+Version:        0.36.1
 %if "x%{postrelease}" != "x0"
 Release:        %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
 %else
@@ -204,6 +204,20 @@ LANG=en_US.utf8 py.test-%{python2_version} -vv tests
 %endif # with_python3
 
 %changelog
+* Fri Apr 28 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.36.1-0.dev.git.c6b38c5
+- Add tito configs (vrutkovs@redhat.com)
+- Backport iter_content changes from
+  https://github.com/kennethreitz/requests/pull/3486 (vrutkovs@redhat.com)
+- Rewrite http.py to use python-requests (puiterwijk@redhat.com)
+- Disable pulp_pull when pulp is not used (lucarval@redhat.com)
+- Configure koji_ssl_certs_dir for bump_release and koji plugins
+  (vrutkovs@redhat.com)
+- Update sendmail plugin config (vrutkovs@redhat.com)
+- LDAP auth method, cosmetic changes (rcerven@redhat.com)
+- LDAP auth method support (rcerven@redhat.com)
+- bump release and make it dev (rcerven@redhat.com)
+- docs: update development setup (ttomecek@redhat.com)
+
 * Tue Apr 04 2017 Robert Cerven <rcerven@redhat.com> - 0.36-1
 - new upstream release: 0.36
 
