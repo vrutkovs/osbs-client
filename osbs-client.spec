@@ -26,7 +26,7 @@
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 # set to 0 to create a normal release
-%global dev_release 1
+%global dev_release 0
 
 %if 0%{?dev_release}
 %global postrelease dev
@@ -39,7 +39,7 @@
 %global osbs_obsolete_vr 0.14-2
 
 Name:           osbs-client
-Version:        0.37
+Version:        0.39
 %if "x%{postrelease}" != "x0"
 Release:        %{release}.%{postrelease}.git.%{shortcommit}%{?dist}
 %else
@@ -200,6 +200,48 @@ LANG=en_US.utf8 py.test-%{python2_version} -vv tests
 %endif # with_python3
 
 %changelog
+* Fri May 05 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.39-1
+- Add .flake8 so that Stickler CI know about our settings (vrutkovs@redhat.com)
+- Remove check for 'spec' from _create_scratch_build (csomh@redhat.com)
+- Make scratch build and output names unique (csomh@redhat.com)
+- disable specifying build_imagestream and build_image (mlangsdo@redhat.com)
+- Add tito configs (vrutkovs@redhat.com)
+- Set a custom nodeselector for scratch builds if low_priority_node_selector
+  config param is set (vrutkovs@redhat.com)
+- Simplify parsing of smtp_* list values (lucarval@redhat.com)
+- Render fetch_maven_artifacts plugin (lucarval@redhat.com)
+- Set config_kwargs for orchestrate_build plugin (lucarval@redhat.com)
+- URL to info page as docker label (rcerven@redhat.com)
+- Disable pulp_pull when pulp is not used (lucarval@redhat.com)
+- Configure koji_ssl_certs_dir for bump_release and koji plugins
+  (vrutkovs@redhat.com)
+- Update sendmail plugin config (vrutkovs@redhat.com)
+- LDAP auth method, cosmetic changes (rcerven@redhat.com)
+- LDAP auth method support (rcerven@redhat.com)
+- bump release and make it dev (rcerven@redhat.com)
+- docs: update development setup (ttomecek@redhat.com)
+
+* Fri May 05 2017 Vadim Rutkovsky <vrutkovs@redhat.com>
+- Add .flake8 so that Stickler CI know about our settings (vrutkovs@redhat.com)
+- Remove check for 'spec' from _create_scratch_build (csomh@redhat.com)
+- Make scratch build and output names unique (csomh@redhat.com)
+- disable specifying build_imagestream and build_image (mlangsdo@redhat.com)
+- Add tito configs (vrutkovs@redhat.com)
+- Set a custom nodeselector for scratch builds if low_priority_node_selector
+  config param is set (vrutkovs@redhat.com)
+- Simplify parsing of smtp_* list values (lucarval@redhat.com)
+- Render fetch_maven_artifacts plugin (lucarval@redhat.com)
+- Set config_kwargs for orchestrate_build plugin (lucarval@redhat.com)
+- URL to info page as docker label (rcerven@redhat.com)
+- Disable pulp_pull when pulp is not used (lucarval@redhat.com)
+- Configure koji_ssl_certs_dir for bump_release and koji plugins
+  (vrutkovs@redhat.com)
+- Update sendmail plugin config (vrutkovs@redhat.com)
+- LDAP auth method, cosmetic changes (rcerven@redhat.com)
+- LDAP auth method support (rcerven@redhat.com)
+- bump release and make it dev (rcerven@redhat.com)
+- docs: update development setup (ttomecek@redhat.com)
+
 * Tue Apr 04 2017 Robert Cerven <rcerven@redhat.com> - 0.36-1
 - new upstream release: 0.36
 
