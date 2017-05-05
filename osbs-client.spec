@@ -39,7 +39,7 @@
 %global osbs_obsolete_vr 0.14-2
 
 Name:           osbs-client
-Version:        0.37
+Version:        0.38
 %if "x%{postrelease}" != "x0"
 Release:        1
 %else
@@ -200,6 +200,12 @@ LANG=en_US.utf8 py.test-%{python2_version} -vv tests
 %endif # with_python3
 
 %changelog
+* Fri May 05 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.38-1
+- 
+
+* Fri May 05 2017 Vadim Rutkovsky <vrutkovs@redhat.com>
+- 
+
 * Fri May 05 2017 Vadim Rutkovsky <vrutkovs@redhat.com> 0.37-1
 - Add .flake8 so that Stickler CI know about our settings (vrutkovs@redhat.com)
 - Remove check for 'spec' from _create_scratch_build (csomh@redhat.com)
