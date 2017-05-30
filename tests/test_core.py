@@ -10,6 +10,7 @@ from textwrap import dedent
 import six
 import time
 import json
+import sys
 
 from osbs.http import HttpResponse
 from osbs.constants import (BUILD_FINISHED_STATES,
@@ -107,18 +108,29 @@ class TestOpenshift(object):
         assert len([log for log in logs]) == 1
 
     def test_stream_logs_connection_close(self, openshift):  # noqa
+
         response = flexmock(status_code=httplib.OK)
         (response
             .should_receive('iter_lines')
             .and_return(["{'stream': 'foo\n'}"])
             .and_raise(StopIteration))
 
+        class FakeHttpStream():
+            def __init__(*args, **kwargs):
+                raise ConnectionError()
+
+        class FakeHttpSession():
+            def get(self, url, *args, **kwargs):
+                try:
+                    FakeHttpStream(url, *args, **kwargs)
+                except Exception as ex:
+                    raise OsbsException(cause=ex, traceback=sys.exc_info()[2])
+
+                return response
+
         (flexmock(openshift)
-            .should_receive('_get')
-            # First: timeout in response after 100s
-            .and_raise(ChunkedEncodingError(''))
-            # Next: return a real response
-            .and_return(response))
+            .should_receive('_con')
+            .and_return(FakeHttpSession()))
 
         (flexmock(time)
             .should_receive('time')
