@@ -75,7 +75,8 @@ class HttpSession(object):
             raise OsbsNetworkException(url, str(ex), ex.response.status_code,
                                        cause=ex, traceback=sys.exc_info()[2])
         except Exception as ex:
-            raise OsbsException(cause=ex, traceback=sys.exc_info()[2])
+            if not isinstance(ex.cause, ConnectionError):
+                raise OsbsException(cause=ex, traceback=sys.exc_info()[2])
 
 
 class HttpStream(object):
