@@ -305,6 +305,7 @@ class BuildSpec(object):
             logger.debug("setting 'imagestream_insecure_registry' to %r", insecure)
 
         timestamp = utcnow().strftime('%Y%m%d%H%M%S')
+        random.seed()
         self.image_tag.value = "%s/%s:%s-%s-%s" % (
             self.user.value,
             self.component.value,

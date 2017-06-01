@@ -95,6 +95,9 @@ class TestBuildSpec(object):
             .and_return(datetime.datetime.strptime(timestr, '%Y%m%d%H%M%S')))
 
         (flexmock(random)
+            .should_receive('seed'))
+
+        (flexmock(random)
             .should_receive('randrange').once()
             .with_args(10**(len(rand) - 1), 10**len(rand))
             .and_return(int(rand)))
