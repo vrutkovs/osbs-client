@@ -872,10 +872,19 @@ class OSBS(object):
         return quota_json['metadata']['name'], quota_json
 
     @osbsapi
-    def pause_builds(self, quota_name=None):
+    def pause_builds(self, quota_name=None, ignore_quota_errors=True):
         # First, set quota so 0 pods are allowed to be running
         quota_name, quota_json = self._load_quota_json(quota_name)
-        self.os.create_resource_quota(quota_name, quota_json)
+        try:
+            self.os.create_resource_quota(quota_name, quota_json)
+        except OsbsResponseException as e:
+            if e.status_code == 403:
+                if ignore_quota_errors:
+                    logger.warning("Failed to create resourcequota, skipping")
+                else:
+                    raise e
+            else:
+                raise e
 
         # Now wait for running builds to finish
         while True:
@@ -894,9 +903,18 @@ class OSBS(object):
             self.wait_for_build_to_finish(name)
 
     @osbsapi
-    def resume_builds(self, quota_name=None):
+    def resume_builds(self, quota_name=None, ignore_quota_errors=True):
         quota_name, _ = self._load_quota_json(quota_name)
-        self.os.delete_resource_quota(quota_name)
+        try:
+            self.os.delete_resource_quota(quota_name)
+        except OsbsResponseException as e:
+            if e.status_code == 403:
+                if ignore_quota_errors:
+                    logger.warning("Failed to remove resourcequota, skipping")
+                else:
+                    raise e
+            else:
+                raise e
 
     # implements subset of OpenShift's export logic in pkg/cmd/cli/cmd/exporter.go
     @staticmethod
