@@ -50,7 +50,8 @@
       "name": "pull_base_image",
       "args": {
         "parent_registry": "{{REGISTRY_URI}}",
-        "parent_registry_insecure": true
+        "parent_registry_insecure": true,
+        "skopeo_copy": true,
       }
     },
     {
@@ -128,6 +129,9 @@
     {
       "name": "flatpak_create_oci"
     }
+  ],
+  "buildstep_plugins": [
+    {"name": "buildah"}
   ],
   "postbuild_plugins": [
     {

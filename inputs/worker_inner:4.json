@@ -90,6 +90,9 @@
       "name": "distribution_scope"
     }
   ],
+  "buildstep_plugins": [
+  {"name": "buildah"}
+  ],
   "prepublish_plugins": [
     {
       "name": "squash"

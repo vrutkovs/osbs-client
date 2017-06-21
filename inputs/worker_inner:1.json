@@ -71,6 +71,11 @@
       "name": "squash"
     }
   ],
+  "buildstep_plugins": [
+    {
+      "name": "buildah"
+    }
+  ],
   "postbuild_plugins": [
     {
       "name": "all_rpm_packages",
