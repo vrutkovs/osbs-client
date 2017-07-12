@@ -22,7 +22,8 @@ except ImportError:
     import http.client as httplib
 
 
-from osbs.exceptions import OsbsException, OsbsNetworkException, OsbsResponseException
+from osbs.exceptions import (
+    OsbsException, OsbsNetworkException, OsbsResponseException, BuildCanceledException)
 
 import requests
 from requests.utils import guess_json_utf
@@ -59,6 +60,8 @@ class HttpSession(object):
             with stream as s:
                 content = s.req.content
                 return HttpResponse(s.status_code, s.headers, content)
+        except BuildCanceledException:
+            raise
         except requests.exceptions.HTTPError as ex:
             raise OsbsNetworkException(url, str(ex), ex.response.status_code,
                                        cause=ex, traceback=sys.exc_info()[2])
