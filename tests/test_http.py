@@ -19,8 +19,11 @@ except ImportError:
     # py3
     import http.client as httplib
 
-from osbs.http import HttpSession, HttpStream
-from osbs.exceptions import OsbsNetworkException, OsbsException
+from osbs.http import HttpSession, HttpStream, OSBSRetry
+from osbs.exceptions import OsbsNetworkException, OsbsException, OsbsResponseException
+from osbs.constants import HTTP_RETRIES_STATUS_FORCELIST
+from requests.exceptions import RetryError
+from requests.packages.urllib3.exceptions import MaxRetryError, ResponseError
 
 logger = logging.getLogger(__file__)
 
@@ -163,3 +166,30 @@ class TestHttpSession(object):
             s.get('http://httpbin.org/get')
 
         assert isinstance(exc_info.value.cause, raise_exc)
+
+    @pytest.mark.parametrize('status_code', HTTP_RETRIES_STATUS_FORCELIST)
+    def test_fail_after_retries(self, s, status_code):
+        with pytest.raises(OsbsNetworkException) as exc_info:
+            s.get('http://httpbin.org/status/%s' % status_code).json()
+        assert isinstance(exc_info.value.cause, RetryError)
+        assert isinstance(exc_info.value.cause.args[0], MaxRetryError)
+        assert isinstance(exc_info.value.cause.args[0].reason, ResponseError)
+        assert isinstance(exc_info.value.status_code, int)
+        assert exc_info.value.status_code == status_code
+
+    @pytest.mark.parametrize('status_code', HTTP_RETRIES_STATUS_FORCELIST)
+    def test_fail_on_first_retry(self, s, status_code):
+        (flexmock(OSBSRetry)
+            .should_receive('is_forced_retry')
+            .and_return(True)
+            .and_return(False))
+        s.get('http://httpbin.org/status/%s' % status_code)
+
+    @pytest.mark.parametrize('status_code', (404, 409))
+    def test_fail_without_retries(self, s, status_code):
+        (flexmock(OSBSRetry)
+            .should_receive('increment')
+            .never())
+        with pytest.raises(OsbsResponseException) as exc_info:
+            s.get('http://httpbin.org/drip?numbytes=5&code=%s' % status_code).json()
+        assert exc_info.value.status_code == status_code

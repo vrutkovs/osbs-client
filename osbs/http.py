@@ -14,6 +14,7 @@ from __future__ import print_function, absolute_import, unicode_literals
 import sys
 import json
 import logging
+import re
 try:
     # py2
     import httplib
@@ -23,8 +24,14 @@ except ImportError:
 
 
 from osbs.exceptions import OsbsException, OsbsNetworkException, OsbsResponseException
+from osbs.constants import (
+    HTTP_MAX_RETRIES, HTTP_BACKOFF_FACTOR, HTTP_RETRIES_STATUS_FORCELIST)
 
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util import Retry
+from requests.packages.urllib3.exceptions import ResponseError
+from requests.exceptions import HTTPError, RetryError
 from requests.utils import guess_json_utf
 try:
     from requests_kerberos import HTTPKerberosAuth
@@ -32,6 +39,22 @@ except ImportError:
     HTTPKerberosAuth = None
 
 logger = logging.getLogger(__name__)
+
+
+class OSBSRetry(Retry):
+    def is_forced_retry(self, method, status_code, has_retry_after=False):
+        if status_code in HTTP_RETRIES_STATUS_FORCELIST:
+            logger.warning("Server returned returned %s", status_code)
+            return True
+        else:
+            return False
+
+    def increment(self, method=None, url=None, response=None,
+                  error=None, _pool=None, _stacktrace=None):
+        logger.warning("retrying url=%s", url)
+        return super(OSBSRetry, self).increment(
+            method=method, url=url, response=response,
+            error=error, _pool=_pool, _stacktrace=_stacktrace)
 
 
 class HttpSession(object):
@@ -59,8 +82,24 @@ class HttpSession(object):
             with stream as s:
                 content = s.req.content
                 return HttpResponse(s.status_code, s.headers, content)
-        except requests.exceptions.HTTPError as ex:
-            raise OsbsNetworkException(url, str(ex), ex.response.status_code,
+        except (HTTPError, RetryError) as ex:
+            if isinstance(ex, RetryError):
+                # RetryError have neither response nor status code set
+                reason = ex.args[0].reason
+                # Try to match it, as ancient python-requests in rhel is ancient
+                if isinstance(reason, ResponseError):
+                    if requests.__version__.startswith('2.6.'):
+                        regexp = r"too many (\d+) error responses"
+                        match = re.search(regexp, reason.message)
+                        if match and len(match.group()) > 0:
+                            status_code = int(match.group(1))
+                        else:
+                            status_code = ''
+                else:
+                    status_code = ''
+            else:
+                status_code = ex.response.status_code
+            raise OsbsNetworkException(url, str(ex), status_code,
                                        cause=ex, traceback=sys.exc_info()[2])
         except Exception as ex:
             raise OsbsException(cause=ex, traceback=sys.exc_info()[2])
@@ -81,12 +120,21 @@ class HttpStream(object):
     def __init__(self, url, method, data=None, kerberos_auth=False,
                  allow_redirects=True, verify_ssl=True, ca=None, use_json=False,
                  headers=None, stream=False, username=None, password=None,
-                 client_cert=None, client_key=None, verbose=False):
+                 client_cert=None, client_key=None, verbose=False, retries_disabled=False):
         self.finished = False  # have we read all data?
         self.closed = False    # have we destroyed curl resources?
 
         self.status_code = 0
         self.headers = None
+
+        retry = OSBSRetry(
+            total=HTTP_MAX_RETRIES,
+            backoff_factor=HTTP_BACKOFF_FACTOR
+        )
+        self.session = requests.Session()
+        if not retries_disabled:
+            self.session.mount('http://', HTTPAdapter(max_retries=retry))
+            self.session.mount('https://', HTTPAdapter(max_retries=retry))
 
         self.url = url
         headers = headers or {}
@@ -131,7 +179,8 @@ class HttpStream(object):
             args['stream'] = True
 
         args['headers'] = headers
-        self.req = requests.request(method, url, **args)
+
+        self.req = self.session.request(method, url, **args)
 
         self.headers = self.req.headers
         self.status_code = self.req.status_code
