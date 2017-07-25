@@ -21,7 +21,7 @@ except ImportError:
 
 from osbs.http import HttpSession, HttpStream, OSBSRetry
 from osbs.exceptions import OsbsNetworkException, OsbsException, OsbsResponseException
-from osbs.constants import HTTP_RETRIES_STATUS_FORCELIST
+from osbs.constants import HTTP_RETRIES_STATUS_FORCELIST, HTTP_MAX_RETRIES
 from requests.exceptions import RetryError
 from requests.packages.urllib3.exceptions import MaxRetryError, ResponseError
 
@@ -169,12 +169,16 @@ class TestHttpSession(object):
 
     @pytest.mark.parametrize('status_code', HTTP_RETRIES_STATUS_FORCELIST)
     def test_fail_after_retries(self, s, status_code):
-        with pytest.raises(OsbsNetworkException) as exc_info:
+        (flexmock(OSBSRetry)
+            .should_call('is_forced_retry'))
+        # latest python-requests throws OsbsResponseException, 2.6.x - OsbsNetworkException
+        with pytest.raises((OsbsNetworkException, OsbsResponseException)) as exc_info:
             s.get('http://httpbin.org/status/%s' % status_code).json()
-        assert isinstance(exc_info.value.cause, RetryError)
-        assert isinstance(exc_info.value.cause.args[0], MaxRetryError)
-        assert isinstance(exc_info.value.cause.args[0].reason, ResponseError)
-        assert isinstance(exc_info.value.status_code, int)
+        if isinstance(exc_info, OsbsNetworkException):
+            assert isinstance(exc_info.value.cause, RetryError)
+            assert isinstance(exc_info.value.cause.args[0], MaxRetryError)
+            assert isinstance(exc_info.value.cause.args[0].reason, ResponseError)
+            assert isinstance(exc_info.value.status_code, int)
         assert exc_info.value.status_code == status_code
 
     @pytest.mark.parametrize('status_code', HTTP_RETRIES_STATUS_FORCELIST)
