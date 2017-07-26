@@ -299,6 +299,30 @@ class BuildRequest(object):
 
                 del registries[placeholder]
 
+    def render_group_manifests_registries(self):
+        if self.dj.dock_json_has_plugin_conf('postbuild_plugins',
+                                             'group_manifests'):
+            push_conf = self.dj.dock_json_get_plugin_conf('postbuild_plugins',
+                                                          'group_manifests')
+            args = push_conf.setdefault('args', {})
+            registries = args.setdefault('registries', {})
+            placeholder = '{{REGISTRY_URI}}'
+
+            if placeholder in registries:
+                for registry, secret in zip_longest(self.spec.registry_uris.value,
+                                                    self.spec.registry_secrets.value):
+                    if not registry.uri:
+                        continue
+
+                    regdict = registries[placeholder].copy()
+                    regdict['version'] = registry.version
+                    if secret:
+                        regdict['secret'] = os.path.join(SECRETS_PATH, secret)
+
+                    registries[registry.docker_uri] = regdict
+
+                del registries[placeholder]
+
     def render_add_yum_repo_by_url(self):
         if (self.spec.yum_repourls.value is not None and
                 self.dj.dock_json_has_plugin_conf('prebuild_plugins',
@@ -1090,6 +1114,7 @@ class BuildRequest(object):
             self.template['spec']['output']['to']['name'] = self.spec.image_tag.value
 
         self.render_tag_and_push_registries()
+        self.render_group_manifests_registries()
 
         if self.has_ist_trigger():
             imagechange = self.template['spec']['triggers'][0]['imageChange']
