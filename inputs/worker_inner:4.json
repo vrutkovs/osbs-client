@@ -141,7 +141,7 @@
         "kojihub": "{{KOJI_HUB}}",
         "url": "{{OPENSHIFT_URI}}",
         "verify_ssl": false,
-        "blocksize": 10485760,
+        "blocksize": 1048576,
         "koji_keytab": false,
         "koji_principal": false
       }
