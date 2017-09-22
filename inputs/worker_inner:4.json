@@ -95,9 +95,6 @@
   ],
   "prepublish_plugins": [
     {
-      "name": "squash"
-    },
-    {
       "name": "flatpak_create_oci"
     }
   ],
