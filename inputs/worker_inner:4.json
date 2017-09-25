@@ -103,7 +103,8 @@
     {
       "name": "all_rpm_packages",
       "args": {
-        "image_id": "BUILT_IMAGE_ID"
+        "image_id": "BUILT_IMAGE_ID",
+        "use_buildah": true
       }
     },
     {
