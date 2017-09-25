@@ -40,6 +40,7 @@
         "parent_registry": "{{REGISTRY_URI}}",
         "parent_registry_insecure": true,
         "use_skopeo": true
+
       }
     },
     {
@@ -118,7 +119,8 @@
       "args": {
         "registries": {
           "{{REGISTRY_URI}}": { "insecure": true }
-        }
+        },
+        "use_buildah": true
       }
     },
     {
@@ -156,9 +158,6 @@
         "url": "{{OPENSHIFT_URI}}",
         "verify_ssl": false
       }
-    },
-    {
-      "name": "remove_built_image"
     }
   ]
 }
