@@ -133,13 +133,6 @@
       }
     },
     {
-      "name": "compress",
-      "args": {
-        "load_exported_image": true,
-        "method": "gzip"
-      }
-    },
-    {
       "name": "koji_upload",
       "args": {
         "kojihub": "{{KOJI_HUB}}",
