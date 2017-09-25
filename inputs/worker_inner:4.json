@@ -120,7 +120,7 @@
         "registries": {
           "{{REGISTRY_URI}}": { "insecure": true }
         },
-        "use_buildah": true
+        "force_use_skopeo": true
       }
     },
     {
